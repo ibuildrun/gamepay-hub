@@ -25,11 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        with:
-          static_site_generator: next
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: frontend
@@ -38,11 +35,18 @@ jobs:
       - name: Build with Next.js
         working-directory: frontend
         env:
-          NEXT_PUBLIC_API_URL: ""
+          NEXT_PUBLIC_API_URL: /api
+          NEXT_PUBLIC_DEMO_MODE: "true"
           NEXT_OUTPUT: export
-        run: |
-          npm run build
-          touch out/.nojekyll
+          NEXT_PUBLIC_BASE_PATH: /gamepay-hub
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Create .nojekyll
+        run: touch frontend/out/.nojekyll
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --accent: 126 157 255;
+    --bg-dark: 11 14 20;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: rgb(var(--bg-dark));
+    color: #ffffff;
+    background-image: 
+      radial-gradient(circle at 20% 20%, rgba(126, 157, 255, 0.03), transparent),
+      radial-gradient(circle at 80% 80%, rgba(126, 157, 255, 0.02), transparent);
+    background-attachment: fixed;
+  }
+
+  .font-heading {
+    font-family: 'Montserrat', system-ui, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0b0e14;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #21262d;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #30363d;
+  }
+}
+
+@layer components {
+  /* Glass morphism card */
+  .glass-card {
+    @apply bg-[#161a23]/60 backdrop-blur-xl border border-white/5 rounded-[1.25rem];
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    @apply border-[#7e9dff]/20;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Glass effect */
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-[#7e9dff] to-[#94acff] bg-clip-text text-transparent;
+  }
+
+  /* Accent color */
+  .text-accent {
+    @apply text-[#7e9dff];
+  }
+
+  .bg-accent {
+    @apply bg-[#7e9dff];
+  }
+
+  .border-accent {
+    @apply border-[#7e9dff];
+  }
+
+  /* Input styles */
+  .input-gaming {
+    @apply w-full bg-black/40 border border-white/10 rounded-2xl py-4 px-6 
+           text-sm font-bold text-white placeholder-gray-700
+           focus:outline-none focus:border-[#7e9dff]/50
+           transition-all duration-200;
+  }
+
+  /* Button primary */
+  .btn-primary {
+    @apply bg-[#7e9dff] text-[#0b0e14] font-black uppercase tracking-widest
+           py-5 px-8 rounded-2xl shadow-xl
+           hover:bg-[#94acff] active:scale-95
+           transition-all duration-200;
+  }
+
+  /* Button secondary */
+  .btn-secondary {
+    @apply bg-white/5 hover:bg-white/10 border border-white/5
+           text-gray-300 font-bold
+           py-3 px-6 rounded-xl
+           transition-all duration-200;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300 hover:translate-y-[-4px];
+  }
+
+  /* Nav link */
+  .nav-link {
+    @apply px-4 py-2 rounded-xl text-[13px] font-bold text-gray-400
+           hover:text-white hover:bg-white/5
+           transition-all duration-200;
+  }
+
+  .nav-link.active {
+    @apply bg-white/5 text-white;
+  }
+
+  /* Glow effects */
+  .glow-text {
+    text-shadow: 0 0 15px rgba(126, 157, 255, 0.4);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(126, 157, 255, 0.3);
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Animation utilities */
+  .animate-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

@@ -1,0 +1,168 @@
+version: '3.8'
+
+services:
+  # ===========================================
+  # NGINX Reverse Proxy
+  # ===========================================
+  nginx:
+    image: nginx:alpine
+    container_name: gamepay-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # Next.js Frontend
+  # ===========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: gamepay-frontend
+    ports:
+      - "3010:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8010
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # Laravel Backend
+  # ===========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: gamepay-backend
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - APP_NAME=GamePay Hub
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - APP_KEY=base64:dGVzdGtleWZvcmRldmVsb3BtZW50MTIzNDU2Nzg5MA==
+      - APP_URL=http://localhost:8010
+      - FRONTEND_URL=http://localhost:3010
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=gamepay
+      - DB_USERNAME=gamepay
+      - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CACHE_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # Queue Worker
+  # ===========================================
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: gamepay-worker
+    command: sh -c "sleep 30 && composer install --no-interaction && php artisan queue:work --verbose --tries=3 --timeout=90"
+    volumes:
+      - ./backend:/var/www/html
+    environment:
+      - APP_NAME=GamePay Hub
+      - APP_ENV=local
+      - APP_KEY=base64:dGVzdGtleWZvcmRldmVsb3BtZW50MTIzNDU2Nzg5MA==
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=gamepay
+      - DB_USERNAME=gamepay
+      - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      - backend
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # PostgreSQL Database
+  # ===========================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: gamepay-postgres
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=gamepay
+      - POSTGRES_USER=gamepay
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gamepay -d gamepay"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # Redis Cache & Queue
+  # ===========================================
+  redis:
+    image: redis:7-alpine
+    container_name: gamepay-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - gamepay-network
+
+  # ===========================================
+  # Mailhog (Email Testing)
+  # ===========================================
+  mailhog:
+    image: mailhog/mailhog
+    container_name: gamepay-mailhog
+    ports:
+      - "1026:1025"
+      - "8026:8025"
+    networks:
+      - gamepay-network
+
+networks:
+  gamepay-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

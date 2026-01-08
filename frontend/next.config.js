@@ -3,11 +3,21 @@ const nextConfig = {
   // Enable React strict mode
   reactStrictMode: true,
 
-  // Output standalone for Docker
-  output: process.env.NEXT_OUTPUT === 'standalone' ? 'standalone' : undefined,
+  // Output configuration
+  // Use 'export' for static generation (GitHub Pages)
+  // Use 'standalone' for Docker production
+  output: process.env.NEXT_OUTPUT === 'standalone' 
+    ? 'standalone' 
+    : process.env.NEXT_OUTPUT === 'export' 
+      ? 'export' 
+      : undefined,
+
+  // Base path for GitHub Pages (if deployed to subdirectory)
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
 
   // Image optimization
   images: {
+    unoptimized: process.env.NEXT_OUTPUT === 'export', // Required for static export
     remotePatterns: [
       {
         protocol: 'https',

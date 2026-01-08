@@ -114,15 +114,15 @@ jobs:
 
       - name: Build static export
         working-directory: frontend
-        run: npm run build:static
+        run: npm run build
         env:
           NEXT_PUBLIC_API_URL: /api
           NEXT_PUBLIC_DEMO_MODE: true
+          NEXT_OUTPUT: export
+          NODE_ENV: production
 
-      - name: Add demo banner
-        working-directory: frontend
-        run: |
-          echo '<div style="background:#ff6b6b;color:white;text-align:center;padding:10px;position:fixed;top:0;left:0;right:0;z-index:9999;">🎮 DEMO MODE - This is a preview deployment</div>' > out/_demo-banner.html
+      - name: Create .nojekyll
+        run: touch frontend/out/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

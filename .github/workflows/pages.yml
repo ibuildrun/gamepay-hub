@@ -39,6 +39,7 @@ jobs:
         working-directory: frontend
         env:
           NEXT_PUBLIC_API_URL: ""
+          NEXT_OUTPUT: export
         run: |
           npm run build
           touch out/.nojekyll

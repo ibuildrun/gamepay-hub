@@ -1,29 +1,50 @@
-# GamePay Hub
+# 🎮 GamePay Hub
+
+[![CI](https://github.com/ibuildrun/gamepay-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/ibuildrun/gamepay-hub/actions/workflows/ci.yml)
+[![Deploy](https://github.com/ibuildrun/gamepay-hub/actions/workflows/deploy.yml/badge.svg)](https://github.com/ibuildrun/gamepay-hub/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Laravel](https://img.shields.io/badge/Laravel-11-red?logo=laravel)](https://laravel.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](https://www.docker.com/)
 
 Платформа для пополнения Steam кошельков, покупки Telegram Stars, игр в подарок и подарочных карт.
 
+![GamePay Hub Preview](https://via.placeholder.com/800x400/0b0e14/7e9dff?text=GamePay+Hub)
+
+## ✨ Возможности
+
+- 🎮 **Steam пополнение** — 0% комиссия для 12 стран СНГ
+- ⭐ **Telegram Stars** — покупка звёзд с минимальной комиссией 2%
+- 🎁 **Игры в подарок** — отправка любой игры Steam на аккаунт
+- 💳 **Подарочные карты** — Steam, PlayStation, Xbox, Nintendo, Apple
+- 🔐 **Авторизация** — Email + Telegram OAuth
+- 📊 **Админ-панель** — управление заказами и пользователями
+- 🌙 **Тёмная тема** — современный gaming дизайн
+
 ## 🚀 Технологии
 
-- **Frontend:** Next.js 14 (App Router, SSR/SSG)
-- **Backend:** Laravel 11 (API, Queues, Sanctum)
-- **Database:** PostgreSQL 16
-- **Cache:** Redis 7
-- **Payments:** PayPalych API
-- **Services:** GreenGamePay API
-- **Containerization:** Docker + Docker Compose
+| Frontend | Backend | Infrastructure |
+|----------|---------|----------------|
+| Next.js 14 | Laravel 11 | Docker |
+| TypeScript | PHP 8.3 | PostgreSQL 16 |
+| Tailwind CSS | Sanctum Auth | Redis 7 |
+| Lucide Icons | Queue Jobs | Nginx |
 
 ## 📁 Структура проекта
 
 ```
 gamepay-hub/
 ├── frontend/           # Next.js приложение
+│   ├── app/            # App Router pages
+│   ├── components/     # React компоненты
+│   └── lib/            # Утилиты и API
 ├── backend/            # Laravel API
+│   ├── app/            # Controllers, Models, Services
+│   ├── routes/         # API routes
+│   └── database/       # Migrations
 ├── infrastructure/     # Docker, Nginx конфигурации
-│   ├── docker/
-│   └── nginx/
-├── legacy/             # Оригинальная Vite/React верстка
-├── .github/            # GitHub Actions workflows
-└── docker-compose.yml
+├── legacy/             # Оригинальная верстка (reference)
+└── .github/            # CI/CD workflows
 ```
 
 ## 🛠 Быстрый старт
@@ -31,68 +52,46 @@ gamepay-hub/
 ### Требования
 
 - Docker Desktop 4.0+
-- Docker Compose 2.0+
 - Git
 
 ### Установка
 
-1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/your-username/gamepay-hub.git
+# Клонируйте репозиторий
+git clone https://github.com/ibuildrun/gamepay-hub.git
 cd gamepay-hub
-```
 
-2. Скопируйте файлы окружения:
-```bash
+# Скопируйте файлы окружения
 cp .env.example .env
-cp frontend/.env.example frontend/.env.local
-cp backend/.env.example backend/.env
-```
 
-3. Запустите Docker контейнеры:
-```bash
+# Запустите Docker контейнеры
 docker-compose -f docker-compose.dev.yml up -d
-```
 
-4. Выполните миграции:
-```bash
+# Выполните миграции
 docker-compose exec backend php artisan migrate
 ```
 
-5. Откройте в браузере:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- Admin Panel: http://localhost:8000/admin
+### Доступ
+
+| Сервис | URL | Порт |
+|--------|-----|------|
+| Frontend | http://localhost:3010 | 3010 |
+| Backend API | http://localhost:8010 | 8010 |
+| PostgreSQL | localhost | 5433 |
+| Redis | localhost | 6380 |
 
 ## 🔧 Разработка
 
-### Frontend (Next.js)
-
 ```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Backend (Laravel)
-
-```bash
-cd backend
-composer install
-php artisan serve
-```
-
-### Docker Development
-
-```bash
-# Запуск всех сервисов
+# Запуск dev окружения
 docker-compose -f docker-compose.dev.yml up
 
 # Пересборка контейнеров
 docker-compose -f docker-compose.dev.yml up --build
 
-# Остановка
-docker-compose -f docker-compose.dev.yml down
+# Логи
+docker-compose -f docker-compose.dev.yml logs -f frontend
+docker-compose -f docker-compose.dev.yml logs -f backend
 ```
 
 ## 🚢 Production
@@ -105,71 +104,71 @@ docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## 📚 API Документация
+## 📚 API Endpoints
 
-API документация доступна по адресу `/api/documentation` после запуска backend.
-
-### Основные эндпоинты
-
+### Авторизация
 | Метод | Путь | Описание |
 |-------|------|----------|
-| POST | /api/v1/auth/login | Авторизация |
-| POST | /api/v1/steam/check-login | Проверка Steam логина |
-| POST | /api/v1/steam/order | Создание заказа на пополнение |
-| POST | /api/v1/orders/{id}/pay | Инициация оплаты |
-| GET | /api/v1/orders | Список заказов пользователя |
+| POST | `/api/auth/register` | Регистрация |
+| POST | `/api/auth/login` | Вход |
+| POST | `/api/auth/logout` | Выход |
+| GET | `/api/auth/me` | Текущий пользователь |
+
+### Steam
+| Метод | Путь | Описание |
+|-------|------|----------|
+| POST | `/api/steam/check-login` | Проверка логина |
+| POST | `/api/steam/calculate` | Расчёт стоимости |
+| POST | `/api/steam/order` | Создание заказа |
+
+### Заказы
+| Метод | Путь | Описание |
+|-------|------|----------|
+| GET | `/api/orders` | Список заказов |
+| GET | `/api/orders/{id}` | Детали заказа |
+| POST | `/api/orders/{id}/pay` | Оплата заказа |
 
 ## 🔐 Переменные окружения
 
-### Backend (.env)
-
 ```env
-APP_ENV=local
-APP_KEY=
-APP_DEBUG=true
-
-DB_CONNECTION=pgsql
-DB_HOST=postgres
-DB_PORT=5432
-DB_DATABASE=gamepay
-DB_USERNAME=gamepay
-DB_PASSWORD=secret
-
-REDIS_HOST=redis
-REDIS_PORT=6379
-
+# Backend
 GREENGAMEPAY_API_URL=https://api.greengamepay.com
 GREENGAMEPAY_API_TOKEN=your_token
-
 PAYPALYCH_BASE_URL=https://pal24.pro
 PAYPALYCH_API_TOKEN=your_token
-PAYPALYCH_SHOP_ID=your_shop_id
-```
 
-### Frontend (.env.local)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:8010
 ```
 
 ## 🧪 Тестирование
 
 ```bash
 # Frontend тесты
-cd frontend && npm test
+docker-compose exec frontend npm test
 
 # Backend тесты
-cd backend && php artisan test
-
-# E2E тесты
-npm run test:e2e
+docker-compose exec backend php artisan test
 ```
 
-## 📝 Лицензия
+## 📝 Changelog
 
-MIT License
+См. [CHANGELOG.md](CHANGELOG.md) для истории изменений.
 
-## 👥 Команда
+## 🤝 Contributing
 
-- [Your Name](https://github.com/your-username)
+См. [CONTRIBUTING.md](CONTRIBUTING.md) для руководства по разработке.
+
+## 🔒 Security
+
+См. [SECURITY.md](SECURITY.md) для политики безопасности.
+
+## 📄 Лицензия
+
+[MIT License](LICENSE) © 2026 GamePay Hub
+
+---
+
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/ibuildrun">ibuildrun</a>
+</p>

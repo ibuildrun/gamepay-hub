@@ -56,7 +56,7 @@ services:
       - APP_NAME=GamePay Hub
       - APP_ENV=local
       - APP_DEBUG=true
-      - APP_KEY=base64:dGVzdGtleWZvcmRldmVsb3BtZW50MTIzNDU2Nzg5MA==
+      - APP_KEY=${APP_KEY:-}
       - APP_URL=http://localhost:8010
       - FRONTEND_URL=http://localhost:3010
       - DB_CONNECTION=pgsql
@@ -92,7 +92,7 @@ services:
     environment:
       - APP_NAME=GamePay Hub
       - APP_ENV=local
-      - APP_KEY=base64:dGVzdGtleWZvcmRldmVsb3BtZW50MTIzNDU2Nzg5MA==
+      - APP_KEY=${APP_KEY:-}
       - DB_CONNECTION=pgsql
       - DB_HOST=postgres
       - DB_PORT=5432

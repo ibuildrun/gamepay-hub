@@ -2,14 +2,14 @@
 
 ## Supported Versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 1.x.x   | :white_check_mark: |
-| < 1.0   | :x:                |
+| Version | Supported |
+| ------- | --------- |
+| 1.x.x   | Yes       |
+| < 1.0   | No        |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within GamePay Hub, please send an email to security@gamepay-hub.com. All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within GamePay Hub, please create a private security advisory on GitHub. All security vulnerabilities will be promptly addressed.
 
 Please include the following information:
 - Type of vulnerability

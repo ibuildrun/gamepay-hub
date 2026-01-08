@@ -19,14 +19,22 @@ use App\Exceptions\PayPalychException;
 final class PayPalychService
 {
     private string $baseUrl;
-    private string $apiToken;
-    private string $shopId;
+    private ?string $apiToken;
+    private ?string $shopId;
 
     public function __construct()
     {
         $this->baseUrl = config('services.paypalych.base_url', 'https://pal24.pro');
         $this->apiToken = config('services.paypalych.api_token');
         $this->shopId = config('services.paypalych.shop_id');
+    }
+
+    /**
+     * Check if service is in demo mode (no API token configured)
+     */
+    public function isDemoMode(): bool
+    {
+        return empty($this->apiToken);
     }
 
     /**
@@ -56,6 +64,11 @@ final class PayPalychService
      */
     public function createBill(array $params): array
     {
+        // Demo mode - return mock payment data
+        if ($this->isDemoMode()) {
+            return $this->demoCreateBill($params);
+        }
+
         $response = $this->client()->post('/api/v1/bill/create', [
             'amount' => $params['amount'],
             'shop_id' => $this->shopId,
@@ -88,6 +101,21 @@ final class PayPalychService
             'link_url' => $data['link_url'],
             'link_page_url' => $data['link_page_url'],
             'bill_id' => $data['bill_id'],
+        ];
+    }
+
+    /**
+     * Demo mode: Create bill (simulated)
+     */
+    private function demoCreateBill(array $params): array
+    {
+        $billId = 'DEMO_' . strtoupper(bin2hex(random_bytes(8)));
+        
+        return [
+            'success' => true,
+            'link_url' => "https://pal24.pro/demo/{$billId}",
+            'link_page_url' => "https://pal24.pro/demo/page/{$billId}",
+            'bill_id' => $billId,
         ];
     }
 

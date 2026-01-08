@@ -2,7 +2,7 @@
 
 Спасибо за интерес к проекту! Этот документ описывает правила и рекомендации для контрибьюторов.
 
-## 🌿 Git Workflow
+## Git Workflow
 
 ### Ветки
 
@@ -25,7 +25,7 @@ git checkout -b fix/payment-validation
 git checkout -b hotfix/critical-security-fix
 ```
 
-## 📝 Conventional Commits
+## Conventional Commits
 
 Все коммиты должны следовать формату [Conventional Commits](https://www.conventionalcommits.org/):
 
@@ -62,14 +62,14 @@ test(auth): add JWT refresh token tests
 chore(deps): update Laravel to 11.2
 ```
 
-## 🔄 Pull Request Process
+## Pull Request Process
 
 1. Создайте ветку от `develop`
 2. Внесите изменения
 3. Убедитесь, что тесты проходят
 4. Создайте Pull Request в `develop`
 5. Дождитесь code review
-6. После approve — merge
+6. После approve - merge
 
 ### PR Checklist
 
@@ -79,7 +79,7 @@ chore(deps): update Laravel to 11.2
 - [ ] Все CI проверки пройдены
 - [ ] PR имеет понятное описание
 
-## 🎨 Code Style
+## Code Style
 
 ### TypeScript/JavaScript (Frontend)
 
@@ -88,11 +88,11 @@ chore(deps): update Laravel to 11.2
 - Именование: camelCase для переменных, PascalCase для компонентов
 
 ```typescript
-// ✅ Хорошо
+// Хорошо
 const steamLogin = 'user123';
 const SteamTopupForm: React.FC = () => { ... };
 
-// ❌ Плохо
+// Плохо
 const steam_login = 'user123';
 const steamTopupForm = () => { ... };
 ```
@@ -123,7 +123,7 @@ final class PaymentService
 }
 ```
 
-## 🧪 Тестирование
+## Тестирование
 
 ### Frontend
 
@@ -157,7 +157,7 @@ php artisan test --filter=PaymentServiceTest
 - Все новые функции должны иметь тесты
 - Property-based тесты для критичной логики
 
-## 📁 Структура файлов
+## Структура файлов
 
 ### Frontend
 
@@ -193,14 +193,13 @@ backend/
 └── tests/
 ```
 
-## 🔒 Security
+## Security
 
 - Никогда не коммитьте секреты и API ключи
 - Используйте `.env` файлы для конфигурации
 - Сообщайте о уязвимостях приватно
 
-## 📞 Контакты
+## Контакты
 
 - Issues: GitHub Issues
 - Discussions: GitHub Discussions
-- Email: dev@gamepay.hub

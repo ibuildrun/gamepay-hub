@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Wallet, Globe, Zap, Info, ChevronRight, CheckCircle2, AlertCircle, Loader2, Copy } from 'lucide-react';
+import { steamApi } from '@/lib/api';
 
 const REGIONS = [
   { code: 'RU', name: 'РОССИЯ', flag: '🇷🇺' },
@@ -60,34 +61,62 @@ export default function SteamPage() {
   // Calculate price when amount changes
   useEffect(() => {
     const numAmount = parseFloat(amount);
-    if (numAmount >= 100) {
+    if (numAmount >= 100 && accountInfo?.valid && login) {
       setCalculating(true);
-      const timer = setTimeout(() => {
-        // Simulated calculation
-        setCalcData({
-          total_usdt: numAmount / 92.5,
-          rate: 92.5
-        });
-        setCalculating(false);
-      }, 300);
+      const timer = setTimeout(async () => {
+        try {
+          const response = await steamApi.calculate(login.trim(), numAmount);
+          const data = response.data;
+          setCalcData({
+            total_usdt: data.total / 92.5, // Convert RUB to USDT
+            rate: 92.5
+          });
+        } catch {
+          // Fallback to local calculation
+          setCalcData({
+            total_usdt: numAmount / 92.5,
+            rate: 92.5
+          });
+        } finally {
+          setCalculating(false);
+        }
+      }, 500);
       return () => clearTimeout(timer);
+    } else if (numAmount >= 100) {
+      // Local calculation when account not verified yet
+      setCalcData({
+        total_usdt: numAmount / 92.5,
+        rate: 92.5
+      });
     }
-  }, [amount]);
+  }, [amount, accountInfo, login]);
 
   const handleVerify = useCallback(async () => {
     if (!login.trim()) return;
     setVerifying(true);
     setVerifyError(null);
     
-    // Simulated API call
-    setTimeout(() => {
-      setAccountInfo({
-        valid: true,
-        country_code: 'RU',
-        country: 'Россия'
-      });
+    try {
+      const response = await steamApi.checkLogin(login.trim());
+      const data = response.data;
+      
+      if (data.valid) {
+        setAccountInfo({
+          valid: true,
+          country_code: data.country || data.country_code,
+          country: data.country_name || data.country
+        });
+      } else {
+        setVerifyError(data.error || 'Аккаунт не найден');
+        setAccountInfo(null);
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
+      setVerifyError(err.response?.data?.error || 'Ошибка проверки логина');
+      setAccountInfo(null);
+    } finally {
       setVerifying(false);
-    }, 1000);
+    }
   }, [login]);
 
   const resetVerify = useCallback(() => {
@@ -104,18 +133,29 @@ export default function SteamPage() {
     setOrderLoading(true);
     setOrderError(null);
     
-    // Simulated order creation
-    setTimeout(() => {
-      setOrderData({
-        order_id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        amount_usdt: (numAmount / 92.5).toFixed(2),
-        payment_address: 'UQBvI0aFLnw2PrPNr8xrgwkOGpXF1mD2gQvour3TQXYZ1234',
-        payment_network: 'TON'
-      });
-      setOrderStep('payment');
+    try {
+      const response = await steamApi.createOrder(login.trim(), numAmount);
+      const data = response.data;
+      
+      if (data.payment_url) {
+        // Redirect to payment page
+        window.location.href = data.payment_url;
+      } else if (data.order_id) {
+        setOrderData({
+          order_id: data.order_id,
+          amount_usdt: (numAmount / calcData.rate).toFixed(2),
+          payment_address: data.payment_address,
+          payment_network: data.payment_network || 'TON'
+        });
+        setOrderStep('payment');
+      }
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
+      setOrderError(err.response?.data?.error || 'Ошибка создания заказа');
+    } finally {
       setOrderLoading(false);
-    }, 1500);
-  }, [accountInfo, login, amount]);
+    }
+  }, [accountInfo, login, amount, calcData.rate]);
 
   const handleConfirmPayment = useCallback(async () => {
     if (!orderData?.order_id) return;

@@ -1,4 +1,4 @@
-# 🎮 GamePay Hub
+# GamePay Hub
 
 [![CI](https://github.com/ibuildrun/gamepay-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/ibuildrun/gamepay-hub/actions/workflows/ci.yml)
 [![Deploy](https://github.com/ibuildrun/gamepay-hub/actions/workflows/deploy.yml/badge.svg)](https://github.com/ibuildrun/gamepay-hub/actions/workflows/deploy.yml)
@@ -9,19 +9,17 @@
 
 Платформа для пополнения Steam кошельков, покупки Telegram Stars, игр в подарок и подарочных карт.
 
-![GamePay Hub Preview](https://via.placeholder.com/800x400/0b0e14/7e9dff?text=GamePay+Hub)
+## Возможности
 
-## ✨ Возможности
+- **Steam пополнение** - 0% комиссия для 12 стран СНГ
+- **Telegram Stars** - покупка звёзд с минимальной комиссией 2%
+- **Игры в подарок** - отправка любой игры Steam на аккаунт
+- **Подарочные карты** - Steam, PlayStation, Xbox, Nintendo, Apple
+- **Авторизация** - Email + Telegram OAuth
+- **Админ-панель** - управление заказами и пользователями
+- **Тёмная тема** - современный gaming дизайн
 
-- 🎮 **Steam пополнение** — 0% комиссия для 12 стран СНГ
-- ⭐ **Telegram Stars** — покупка звёзд с минимальной комиссией 2%
-- 🎁 **Игры в подарок** — отправка любой игры Steam на аккаунт
-- 💳 **Подарочные карты** — Steam, PlayStation, Xbox, Nintendo, Apple
-- 🔐 **Авторизация** — Email + Telegram OAuth
-- 📊 **Админ-панель** — управление заказами и пользователями
-- 🌙 **Тёмная тема** — современный gaming дизайн
-
-## 🚀 Технологии
+## Технологии
 
 | Frontend | Backend | Infrastructure |
 |----------|---------|----------------|
@@ -30,7 +28,7 @@
 | Tailwind CSS | Sanctum Auth | Redis 7 |
 | Lucide Icons | Queue Jobs | Nginx |
 
-## 📁 Структура проекта
+## Структура проекта
 
 ```
 gamepay-hub/
@@ -43,11 +41,10 @@ gamepay-hub/
 │   ├── routes/         # API routes
 │   └── database/       # Migrations
 ├── infrastructure/     # Docker, Nginx конфигурации
-├── legacy/             # Оригинальная верстка (reference)
 └── .github/            # CI/CD workflows
 ```
 
-## 🛠 Быстрый старт
+## Быстрый старт
 
 ### Требования
 
@@ -80,7 +77,7 @@ docker-compose exec backend php artisan migrate
 | PostgreSQL | localhost | 5433 |
 | Redis | localhost | 6380 |
 
-## 🔧 Разработка
+## Разработка
 
 ```bash
 # Запуск dev окружения
@@ -94,7 +91,7 @@ docker-compose -f docker-compose.dev.yml logs -f frontend
 docker-compose -f docker-compose.dev.yml logs -f backend
 ```
 
-## 🚢 Production
+## Production
 
 ```bash
 # Сборка production образов
@@ -104,7 +101,7 @@ docker-compose -f docker-compose.prod.yml build
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## 📚 API Endpoints
+## API Endpoints
 
 ### Авторизация
 | Метод | Путь | Описание |
@@ -128,7 +125,43 @@ docker-compose -f docker-compose.prod.yml up -d
 | GET | `/api/orders/{id}` | Детали заказа |
 | POST | `/api/orders/{id}/pay` | Оплата заказа |
 
-## 🔐 Переменные окружения
+## Настройка платежей PayPalych
+
+Для работы платежей через PayPalych (pal24.pro) необходимо:
+
+1. Зарегистрироваться на https://pal24.pro
+2. Создать магазин в личном кабинете
+3. Получить API Token и Shop ID
+4. Настроить Result URL для вебхуков: `https://your-domain.com/api/webhooks/paypalych`
+5. Добавить переменные в `.env`:
+
+```env
+PAYPALYCH_BASE_URL=https://pal24.pro
+PAYPALYCH_API_TOKEN=your_api_token_here
+PAYPALYCH_SHOP_ID=your_shop_id_here
+```
+
+### Тестирование платежей
+
+В демо-режиме (без API токена) система работает с моковыми данными. Для полного тестирования:
+
+1. Используйте тестовый магазин PayPalych
+2. Создайте тестовый заказ через API
+3. Проверьте получение вебхука на `/api/webhooks/paypalych`
+
+## Настройка GreenGamePay
+
+Для работы Steam пополнения:
+
+1. Получите API доступ на https://greengamepay.com
+2. Добавьте переменные в `.env`:
+
+```env
+GREENGAMEPAY_API_URL=https://api.greengamepay.com
+GREENGAMEPAY_API_TOKEN=your_api_token_here
+```
+
+## Переменные окружения
 
 ```env
 # Backend
@@ -136,12 +169,13 @@ GREENGAMEPAY_API_URL=https://api.greengamepay.com
 GREENGAMEPAY_API_TOKEN=your_token
 PAYPALYCH_BASE_URL=https://pal24.pro
 PAYPALYCH_API_TOKEN=your_token
+PAYPALYCH_SHOP_ID=your_shop_id
 
 # Frontend
 NEXT_PUBLIC_API_URL=http://localhost:8010
 ```
 
-## 🧪 Тестирование
+## Тестирование
 
 ```bash
 # Frontend тесты
@@ -151,24 +185,18 @@ docker-compose exec frontend npm test
 docker-compose exec backend php artisan test
 ```
 
-## 📝 Changelog
+## Changelog
 
 См. [CHANGELOG.md](CHANGELOG.md) для истории изменений.
 
-## 🤝 Contributing
+## Contributing
 
 См. [CONTRIBUTING.md](CONTRIBUTING.md) для руководства по разработке.
 
-## 🔒 Security
+## Security
 
 См. [SECURITY.md](SECURITY.md) для политики безопасности.
 
-## 📄 Лицензия
+## Лицензия
 
-[MIT License](LICENSE) © 2026 GamePay Hub
-
----
-
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/ibuildrun">ibuildrun</a>
-</p>
+[MIT License](LICENSE) - 2026 GamePay Hub

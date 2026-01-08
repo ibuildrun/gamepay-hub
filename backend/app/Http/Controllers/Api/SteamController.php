@@ -22,20 +22,20 @@ class SteamController extends Controller
             'login' => 'required|string|max:255',
         ]);
 
-        $result = $this->greenGamePay->checkSteamLogin($validated['login']);
+        try {
+            $result = $this->greenGamePay->checkSteamLogin($validated['login']);
 
-        if (!$result['success']) {
+            return response()->json([
+                'valid' => $result['valid'] ?? true,
+                'country' => $result['country_code'] ?? $result['country'] ?? null,
+                'country_name' => $result['country'] ?? $result['country_name'] ?? null,
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'valid' => false,
-                'error' => $result['error'] ?? 'Не удалось проверить логин',
+                'error' => 'Аккаунт не найден или недоступен',
             ], 400);
         }
-
-        return response()->json([
-            'valid' => true,
-            'country' => $result['country'] ?? null,
-            'country_name' => $result['country_name'] ?? null,
-        ]);
     }
 
     public function calculate(Request $request): JsonResponse

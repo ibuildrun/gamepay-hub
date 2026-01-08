@@ -20,11 +20,11 @@ use App\Exceptions\GreenGamePayException;
 final class GreenGamePayService
 {
     private string $baseUrl;
-    private string $apiToken;
+    private ?string $apiToken;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.greengamepay.base_url');
+        $this->baseUrl = config('services.greengamepay.base_url', 'https://api.greengamepay.com');
         $this->apiToken = config('services.greengamepay.api_token');
     }
 
@@ -47,6 +47,11 @@ final class GreenGamePayService
      */
     public function checkSteamLogin(string $login): array
     {
+        // If API token is not configured, use demo mode
+        if (empty($this->apiToken)) {
+            return $this->demoCheckSteamLogin($login);
+        }
+
         $response = $this->client()->post('/steam/check-login', [
             'login' => $login,
         ]);
@@ -59,6 +64,35 @@ final class GreenGamePayService
         }
 
         return $response->json();
+    }
+
+    /**
+     * Demo mode: Check Steam login (simulated)
+     */
+    private function demoCheckSteamLogin(string $login): array
+    {
+        // Simulate API delay
+        usleep(300000); // 300ms
+        
+        // Simple validation - login must be at least 3 characters
+        if (strlen($login) < 3) {
+            return [
+                'valid' => false,
+                'error' => 'Логин слишком короткий',
+            ];
+        }
+
+        // Demo: return random country from supported list
+        $countries = $this->getSupportedCountries();
+        $codes = array_keys($countries);
+        $randomCode = $codes[array_rand($codes)];
+
+        return [
+            'valid' => true,
+            'login' => $login,
+            'country_code' => $randomCode,
+            'country' => $countries[$randomCode],
+        ];
     }
 
     /**
@@ -75,6 +109,11 @@ final class GreenGamePayService
      */
     public function calculateSteamPrice(string $login, float $amountRub): array
     {
+        // If API token is not configured, use demo mode
+        if (empty($this->apiToken)) {
+            return $this->demoCalculateSteamPrice($login, $amountRub);
+        }
+
         $response = $this->client()->post('/steam/calculate', [
             'login' => $login,
             'amount' => $amountRub,
@@ -88,6 +127,24 @@ final class GreenGamePayService
         }
 
         return $response->json();
+    }
+
+    /**
+     * Demo mode: Calculate Steam price (simulated)
+     */
+    private function demoCalculateSteamPrice(string $login, float $amountRub): array
+    {
+        $exchangeRate = 92.5; // Demo rate
+        $amountUsdt = $amountRub / $exchangeRate;
+
+        return [
+            'success' => true,
+            'price' => $amountRub,
+            'amount_rub' => $amountRub,
+            'amount_usdt' => round($amountUsdt, 2),
+            'exchange_rate' => $exchangeRate,
+            'commission' => 0,
+        ];
     }
 
     /**

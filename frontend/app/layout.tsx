@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
 import { Navbar } from '@/components/layout/Navbar';
 import { Footer } from '@/components/layout/Footer';
+import { AuthProvider } from '@/lib/auth';
 import './globals.css';
 
 const inter = Inter({ 
@@ -52,11 +53,13 @@ export default function RootLayout({
   return (
     <html lang="ru" className={`${inter.variable} ${montserrat.variable}`}>
       <body className="min-h-screen bg-dark-900 text-white antialiased">
-        <Navbar />
-        <main className="pt-20 md:pt-24">
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main className="pt-20 md:pt-24">
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

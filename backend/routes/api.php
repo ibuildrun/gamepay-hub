@@ -29,6 +29,8 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
+        Route::put('/password', [AuthController::class, 'updatePassword']);
     });
 });
 
@@ -73,4 +75,15 @@ Route::middleware('auth:sanctum')->prefix('orders')->group(function () {
 Route::prefix('webhooks')->group(function () {
     Route::post('/paypalych', [WebhookController::class, 'handlePayPalych']);
     Route::post('/greengamepay', [WebhookController::class, 'handleGreenGamePay']);
+});
+
+// Admin routes
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::get('/stats', [App\Http\Controllers\Api\AdminController::class, 'stats']);
+    Route::get('/orders', [App\Http\Controllers\Api\AdminController::class, 'orders']);
+    Route::get('/orders/{id}', [App\Http\Controllers\Api\AdminController::class, 'orderDetail']);
+    Route::put('/orders/{id}/status', [App\Http\Controllers\Api\AdminController::class, 'updateOrderStatus']);
+    Route::get('/users', [App\Http\Controllers\Api\AdminController::class, 'users']);
+    Route::get('/users/{id}', [App\Http\Controllers\Api\AdminController::class, 'userDetail']);
+    Route::put('/users/{id}/admin', [App\Http\Controllers\Api\AdminController::class, 'toggleAdmin']);
 });
